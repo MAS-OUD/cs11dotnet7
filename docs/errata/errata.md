@@ -1,4 +1,4 @@
-**Errata** (34 items)
+**Errata** (42 items)
 
 If you find any mistakes, then please [raise an issue in this repository](https://github.com/markjprice/cs11dotnet7/issues) or email me at markjprice (at) gmail.com.
 
@@ -8,11 +8,13 @@ If you find any mistakes, then please [raise an issue in this repository](https:
 - [Page 11 - Understanding the journey to one .NET and Understanding .NET support](#page-11---understanding-the-journey-to-one-net-and-understanding-net-support)
 - [Page 36 - Getting help for the dotnet tool](#page-36---getting-help-for-the-dotnet-tool)
 - [Page 37 - Getting definitions of types and their members](#page-37---getting-definitions-of-types-and-their-members)
+- [Page 75 - Comparing double and decimal types](#page-75---comparing-double-and-decimal-types)
 - [Page 83 - Formatting using numbered positional arguments](#page-83---formatting-using-numbered-positional-arguments)
 - [Page 83 - Formatting using interpolated strings](#page-83---formatting-using-interpolated-strings)
 - [Page 85 - Getting text input from the user](#page-85---getting-text-input-from-the-user)
 - [Page 86 - Getting text input from the user](#page-86---getting-text-input-from-the-user)
 - [Page 114 - Simplifying switch statements with switch expressions](#page-114---simplifying-switch-statements-with-switch-expressions)
+- [Page 116 - Looping with the do statement](#page-116---looping-with-the-do-statement)
 - [Page 156 - Calculating factorials with recursion](#page-156---calculating-factorials-with-recursion)
 - [Page 166 - Setting a breakpoint and starting debugging - Using Visual Studio 2022](#page-166---setting-a-breakpoint-and-starting-debugging---using-visual-studio-2022)
 - [Page 178 - Reviewing project packages](#page-178---reviewing-project-packages)
@@ -20,19 +22,27 @@ If you find any mistakes, then please [raise an issue in this repository](https:
 - [Page 185 - Creating a class library that needs testing](#page-185---creating-a-class-library-that-needs-testing)
 - [Page 188 - Running unit tests using Visual Studio Code](#page-188---running-unit-tests-using-visual-studio-code)
 - [Page 231 - Requiring properties to be set during instantiation](#page-231---requiring-properties-to-be-set-during-instantiation)
+- [Page 235 - More about methods](#page-235---more-about-methods)
 - [Page 244 - Init-only properties](#page-244---init-only-properties)
 - [Page 258 - Defining and handling events](#page-258---defining-and-handling-events)
+- [Page 263 - Comparing objects using a separate class](#page-263---comparing-objects-using-a-separate-class)
 - [Page 272 - Defining struct types](#page-272---defining-struct-types)
 - [Page 275 - Releasing unmanaged resources](#page-275---releasing-unmanaged-resources)
 - [Page 277 - Making a value type nullable](#page-277---making-a-value-type-nullable)
 - [Page 279 - Declaring non-nullable variables and parameters](#page-279---declaring-non-nullable-variables-and-parameters)
 - [Page 322 - Revealing the location of a type](#page-322---revealing-the-location-of-a-type)
 - [Page 330 - Publishing a self-contained app, Page 354 - Exercise 7.3 – Explore PowerShell](#page-330---publishing-a-self-contained-app-page-354---exercise-73--explore-powershell)
+- [Page 357 - Working with complex numbers](#page-357---working-with-complex-numbers)
 - [Page 399 - Managing directories](#page-399---managing-directories)
 - [Page 362 - Joining, formatting, and other string members](#page-362---joining-formatting-and-other-string-members)
 - [Page 412 - Compressing streams](#page-412---compressing-streams)
+- [Page 454 - Scaffolding models using an existing database](#page-454---scaffolding-models-using-an-existing-database)
+  - [Category class changes](#category-class-changes)
+  - [NorthwindDb class changes](#northwinddb-class-changes)
 - [Page 477 - Inserting entities](#page-477---inserting-entities)
+- [Page 478 - Updating entities](#page-478---updating-entities)
 - [Page 548 - Creating a class library for a Northwind database context](#page-548---creating-a-class-library-for-a-northwind-database-context)
+- [Page 550 - Creating a class library for entity models using SQL Server](#page-550---creating-a-class-library-for-entity-models-using-sql-server)
 - [Page 551 - Creating a class library for entity models using SQL Server](#page-551---creating-a-class-library-for-entity-models-using-sql-server)
 - [Page 627 - Defining a typed view](#page-627---defining-a-typed-view)
 - [Page 631 - Passing parameters using a route value](#page-631---passing-parameters-using-a-route-value)
@@ -106,6 +116,12 @@ To change back to the original Visual Studio 2022 behavior that is described in 
 
 *Figure 1.3: Disabling Source Link for the Go To Definition feature*
 
+# Page 75 - Comparing double and decimal types
+
+> Thanks to [Papa Smurf](https://github.com/GoPapaSmurf) for raising this [issue on 31 March 2023](https://github.com/markjprice/cs11dotnet7/issues/53).
+
+At the end of the last paragraph, I mention a method that can determine if a number value is *not-a-number*. The method name was written in the book as `IsNan`. It should be `IsNaN`.
+
 # Page 83 - Formatting using numbered positional arguments
 
 At the end of the section, I say, "The `Write`, `WriteLine`, and `Format` methods can have up to four numbered arguments, named `arg0`, `arg1`, `arg2`, and `arg3`." 
@@ -173,6 +189,43 @@ It should be:
 ```cs
 Cat fourLeggedCat when fourLeggedCat.Legs == 4
   => $"The cat named {fourLeggedCat.Name} has four legs.",
+```
+
+# Page 116 - Looping with the do statement
+
+> Thanks to Norbert Duenki who raised this issue by email on 4 April 2023.
+
+In Step 3, I wrote, "As an optional challenge, add statements so that the user can only make ten attempts before 
+an error message is displayed."
+
+In my code solution in GitHub, I made a mistake in my logic so that if the user entered the correct password on their tenth attempt, it output the error message.
+
+I have updated the logic to fix this issue, as well as to use variables to store the actual password and the maximum number of attempts, as shown in the following code:
+```cs
+// Looping with the do statement
+
+string? actualPassword = "Pa$$w0rd";
+string? password;
+int maximumAttempts = 10;
+int attempts = 0;
+
+do
+{
+  attempts++;
+  Write("Enter your password: ");
+  password = ReadLine();
+}
+while ((password != actualPassword) & (attempts < maximumAttempts));
+
+if (password == actualPassword)
+{
+  WriteLine("Correct!");
+}
+else
+{
+  WriteLine("You have used {0} attempts! The password was {1}.",
+    arg0: maximumAttempts, arg1: actualPassword);
+}
 ```
 
 # Page 156 - Calculating factorials with recursion
@@ -286,6 +339,14 @@ the following markup:
 
 - Build the `PeopleApp` project.
 
+# Page 235 - More about methods
+
+> Thanks to [cgwid](https://github.com/cgwid) for raising this [issue on 12 April 2023](https://github.com/markjprice/cs11dotnet7/issues/59).
+
+In this section, we define some methods and operators so that two `Person` objects can get married and have babies. The example we model comes from the Bible story of Lamech and his two wives and their children. But the code I tell you to write does not allow Lamech to marry two women so later an exception is thrown when Lamech and his second wife try to make a baby. 
+
+cgwid suggested a solution in [the issue they raised](https://github.com/markjprice/cs11dotnet7/issues/59). I want to rethink this code example for the next edition to avoid it becoming overly complex so I will leave it to the reader to decide how they might want to solve it. Meanwhile, I have added an improvement with suggested alternative code here: https://github.com/markjprice/cs11dotnet7/blob/main/docs/errata/improvements.md#page-235---more-about-methods
+
 # Page 244 - Init-only properties
 
 > Thanks to Bob Molloy for raising this issue via email.
@@ -303,6 +364,19 @@ WriteLine($"Stop it!");
 The `$` can be removed, as shown in the following code:
 ```cs
 WriteLine("Stop it!");
+```
+
+# Page 263 - Comparing objects using a separate class
+
+> Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 15 March 2023](https://github.com/markjprice/cs11dotnet7/issues/43).
+
+In Step 1, the following comment has an extra slash:
+```cs
+/// ...if they are equal...
+```
+It should be:
+```cs
+// ...if they are equal...
 ```
 
 # Page 272 - Defining struct types
@@ -358,6 +432,26 @@ If you have Source Link disabled, then to see the filename you must expand the c
 
 In the **Good Practice** box on page 330, I wrote about how you can automate commands using scripts written in the PowerShell language. My original plan was to write content about PowerShell in the GitHub repository. But PowerShell is a massive topic and there will always be higher priority content to create that is specifically about C# and .NET. In the next edition I will just reference the official PowerShell documentation: https://learn.microsoft.com/en-us/powershell/ And I will remove **Exercise 7.3** that suggests exploring PowerShell.
 
+# Page 357 - Working with complex numbers
+
+> Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 25 March 2023](https://github.com/markjprice/cs11dotnet7/issues/50).
+
+In Step 2, I show the default formatting for complex numbers i.e. using round brackets and commas, as well as a custom format, as shown in the following output:
+```
+(4, 2) added to (3, 7) is (7, 9)
+4 + 2i added to 3 + 7i is 7 + 9i
+```
+
+> See the official documentation for the `Complex.ToString` method here: https://learn.microsoft.com/en-us/dotnet/api/system.numerics.complex.tostring
+
+Although this is the behavior in .NET 6, in .NET 7 (and .NET 8 previews), the formatting of complex numbers uses angle brackets and semi-colons, as shown in the following output:
+```
+<4; 2> added to <3; 7> is <7; 9>
+4 + 2i added to 3 + 7i is 7 + 9i
+```
+
+In the next edition, I will add a note about this. Since the official documentation still shows the behavior of .NET 6, this seems odd. My guess is that they decided to change to angle brackets and semi-colons because some cultures use round brackets to indicate negative numbers and use commas for decimal numbers. Therefore it would be confusing to have a mix of round brackets and commas meaning different things. Its a shame the documentation does not explain this and show the .NET 7 and later new default formats.
+
 # Page 399 - Managing directories
 
 > Thanks to [Dario Bosco](https://github.com/DarioBosco) for raising this [issue on 6 February 2023](https://github.com/markjprice/cs11dotnet7/issues/26).
@@ -385,6 +479,88 @@ It should be:
 WriteLine("The compressed contents:");
 ```
 
+# Page 454 - Scaffolding models using an existing database
+
+> Thanks to [Masoud](https://github.com/MAS-OUD) for raising this [issue on 6 April 2023](https://github.com/markjprice/cs11dotnet7/issues/54).
+
+## Category class changes
+
+In Step 5, I show the class that represents a `Category` in the Northwind database that is generated by the `dotnet-ef`, as shown in the following code:
+```cs
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace WorkingWithEFCore.AutoGen
+{
+  [Index("CategoryName", Name = "CategoryName")]
+  public partial class Category
+  {
+    public Category()
+    {
+      Products = new HashSet<Product>();
+    }
+
+    [Key]
+    public int CategoryId { get; set; }
+
+    [StringLength(15)]
+    public string CategoryName { get; set; }
+
+    [Column(TypeName = "ntext")]
+    public string? Description { get; set; }
+
+    [Column(TypeName = "image")]
+    public byte[]? Picture { get; set; }
+
+    [InverseProperty("Category")]
+    public virtual ICollection<Product> Products { get; set; }
+  }
+}
+```
+The current `dotnet-ef` tool generates slightly different output, for example, it uses a file-scoped namespace declaration to avoid indenting and it initializes the `Products` property to a `List<T>` instead of a `HashSet<T>`, as shown in the following code:
+```cs
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace WorkingWithEFCore.AutoGen;
+
+[Index("CategoryName", Name = "CategoryName")]
+public partial class Category
+{
+  [Key]
+  public int CategoryId { get; set; }
+
+  [StringLength(15)]
+  public string CategoryName { get; set; } = null!;
+
+  [Column(TypeName = "ntext")]
+  public string? Description { get; set; }
+
+  [Column(TypeName = "image")]
+  public byte[]? Picture { get; set; }
+
+  [InverseProperty("Category")]
+  public virtual ICollection<Product> Products { get; } = new List<Product>();
+}
+```
+
+## NorthwindDb class changes
+
+In Step 7, I show the class that represents the Northwind database that was generated by the `dotnet-ef` tool. The current `dotnet-ef` tool generates slightly different output, for example, it uses a file-scoped namespace declaration to avoid indenting and it does not set each `DbSet<T>` property to the null-forgiving operator, as shown in the following code:
+```cs
+// older version of dotnet-ef did this:
+public virtual DbSet<Category> Categories { get; set; } = null!;
+
+// current version of dotnet-ef does this:
+public virtual DbSet<Category> Categories { get; set; }
+```
+
 # Page 477 - Inserting entities
 
 > Thanks to [Chadwick Geyser](https://github.com/chadwickgeyser) for raising this [issue on 29 November 2022](https://github.com/markjprice/cs11dotnet7/issues/5).
@@ -396,6 +572,20 @@ ListProducts(productIdToHighlight: resultAdd.productId);
 It should use the method signature that allows multiple `productIds` to be highlighted, as shown in the following code:
 ```cs
 ListProducts(productIdsToHighlight: new[] { resultAdd.productId });
+```
+
+# Page 478 - Updating entities
+
+> Thanks to [Masoud](https://github.com/MAS-OUD) for raising this [issue on 11 April 2023](https://github.com/markjprice/cs11dotnet7/issues/57).
+
+In Step 2, the statement to output the price increase, as shown in the following code:
+```cs
+WriteLine("Increase price success for ID: {resultUpdate.productId}.");
+```
+
+Is missing the `$` prefix to make it an interpolated string, as shown in the following code:
+```cs
+WriteLine($"Increase price success for ID: {resultUpdate.productId}.");
 ```
 
 # Page 548 - Creating a class library for a Northwind database context
@@ -440,6 +630,34 @@ public static class NorthwindContextExtensions {
 }
 ```
 
+# Page 550 - Creating a class library for entity models using SQL Server
+
+> Thanks to Amer Cejudo for raising this issue by email on 8 April 2023.
+
+In Step 6, I tell the reader to enter a command to generate code from an existing SQL Server database, as shown in the following command:
+```
+dotnet ef dbcontext scaffold "Data Source=.;Initial Catalog=Northwind;Integrated Security=true;" Microsoft.EntityFrameworkCore.SqlServer --namespace Packt.Shared --data-annotations
+```
+
+If you get the error, "The certificate chain was issued by an authority that is not trusted.", then it is because the connection to the SQL Server database will be encrypted by default but the OS and therefore the app does not (yet) trust the local development server certificate. 
+
+You have three choices to fix this issue:
+
+1. Add the following to the database connection string to make the certicate trusted for this connection:
+```
+TrustServerCertificate=true;
+```
+
+2. Add the following to the database connection string to disable encryption so it does not need to trust the certificate for this connection:
+```
+Encrypt=false;
+```
+
+3. Run the following at the command-line to trust the certificate for all .NET apps in future:
+```
+dotnet dev-certs https --trust
+```
+
 # Page 551 - Creating a class library for entity models using SQL Server
 
 In Step 15, you write an extension method that registers the `NorthwindContext` class for use as a dependency service. In later chapters, this will be used in ASP.NET Core and Blazor projects. By default, a `DbContext` class is registered using `Scope` lifetime, meaning that multiple threads can share the same instance. If more than one thread attempts to use the same `NorthwindContext` class instance at the same time then you will see the following runtime exception thrown:
@@ -477,6 +695,8 @@ public static class NorthwindContextExtensions {
   }
 }
 ```
+
+> Note that I have also written a related improvement here: https://github.com/markjprice/cs11dotnet7/blob/main/docs/errata/improvements.md#page-551---creating-a-class-library-for-entity-models-using-sql-server
 
 # Page 627 - Defining a typed view
 

@@ -1,7 +1,8 @@
-**Improvements** (20 items)
+**Improvements** (30 items)
 
 If you have suggestions for improvements, then please [raise an issue in this repository](https://github.com/markjprice/cs11dotnet7/issues) or email me at markjprice (at) gmail.com.
 
+- [Page 25 - Adding a second project using Visual Studio 2022](#page-25---adding-a-second-project-using-visual-studio-2022)
 - [Page 69 - Raw interpolated string literals](#page-69---raw-interpolated-string-literals)
 - [Page 86 - Getting text input from the user](#page-86---getting-text-input-from-the-user)
 - [Page 128 - Rounding numbers](#page-128---rounding-numbers)
@@ -10,18 +11,37 @@ If you have suggestions for improvements, then please [raise an issue in this re
 - [Page 161 - Using lambdas in function implementations](#page-161---using-lambdas-in-function-implementations)
 - [Page 179 - Reviewing project packages](#page-179---reviewing-project-packages)
 - [Page 200 - Talking about OOP](#page-200---talking-about-oop)
+- [Page 235 - More about methods](#page-235---more-about-methods)
 - [Page 237 - Implementing functionality using methods](#page-237---implementing-functionality-using-methods)
 - [Page 241 - Defining flight passengers](#page-241---defining-flight-passengers)
 - [Page 251 - Setting up a class library and console application](#page-251---setting-up-a-class-library-and-console-application)
+- [Page 270 - Equality of types](#page-270---equality-of-types)
 - [Page 299 - Treating warnings as errors](#page-299---treating-warnings-as-errors)
+- [Page 339 - Viewing source links with Visual Studio 2022](#page-339---viewing-source-links-with-visual-studio-2022)
+- [Page 343 - Packaging a library for NuGet](#page-343---packaging-a-library-for-nuget)
+- [Page 351 - Using non-.NET Standard libraries](#page-351---using-non-net-standard-libraries)
+- [Page 378 - Dictionaries](#page-378---dictionaries)
+- [Page 444 - Connecting to a database](#page-444---connecting-to-a-database)
 - [Page 453 - Scaffolding models using an existing database](#page-453---scaffolding-models-using-an-existing-database)
+- [Page 512 - Group-joining sequences](#page-512---group-joining-sequences)
 - [Page 533 - Building websites using ASP.NET Core](#page-533---building-websites-using-aspnet-core)
 - [Page 547 - Creating a class library for a Northwind database context](#page-547---creating-a-class-library-for-a-northwind-database-context)
 - [Page 551 - Creating a class library for entity models using SQL Server](#page-551---creating-a-class-library-for-entity-models-using-sql-server)
 - [Page 573 - Adding code to a Razor Page](#page-573---adding-code-to-a-razor-page)
+- [Page 586 - Creating a Razor class library, Page 587 - Implementing a partial view to show a single employee](#page-586---creating-a-razor-class-library-page-587---implementing-a-partial-view-to-show-a-single-employee)
 - [Page 601 - Setting up an ASP.NET Core MVC website](#page-601---setting-up-an-aspnet-core-mvc-website)
 - [Page 654 - Making controller action methods asynchronous](#page-654---making-controller-action-methods-asynchronous)
 - [Page 655 - Exercise 14.2 – Practice implementing MVC by implementing a category detail page](#page-655---exercise-142--practice-implementing-mvc-by-implementing-a-category-detail-page)
+
+# Page 25 - Adding a second project using Visual Studio 2022
+
+> Thanks to [yoshist](https://github.com/yoshist) who raised this issue on [10 April 2023](https://github.com/markjprice/cs11dotnet7/issues/56).
+
+In Step 6, I wrote, "In Solution Explorer, right-click the Chapter01 solution, select Set Startup Projects…, set 
+Current selection, and then click OK." Then in Step 7, I wrote, "In Solution Explorer, click the AboutMyEnvironment project (or any file or folder within it), and note that Visual Studio indicates that AboutMyEnvironment is now the startup project by 
+making the project name bold."
+
+In the next edition, I will add a note to explicitly explain that I recommend this way of setting the startup project because it then makes it very easy to switch startup projects by simply clicking a project (or any file in a project) to make it the startup project. Although you can right-click a project and set it as a startup project, if you then want to run a different project, you must manually change it again. Simply clicking anywhere in the project is easier. 
 
 # Page 69 - Raw interpolated string literals
 
@@ -216,6 +236,129 @@ interface ITheta { void M3() { } void M4(); }
 class Iota : ITheta { void M4() { } }
 ```
 
+# Page 235 - More about methods
+
+> Thanks to [cgwid](https://github.com/cgwid) for raising this [issue on 12 April 2023](https://github.com/markjprice/cs11dotnet7/issues/59).
+
+In this section, we define some methods and operators so that two `Person` objects can get married and have babies. The example we model comes from the Bible story of Lamech and his two wives and their children. But the code I tell you to write does not allow Lamech to marry two women so later an exception is thrown when Lamech and his second wife try to make a baby. 
+
+cgwid suggested a solution in [the issue they raised](https://github.com/markjprice/cs11dotnet7/issues/59). 
+
+Here is my possible improvement. I might change it before using it in the next edition. We could use a `List<Person>` to store the zero, one or more people that a `Person` is married too. We could implement `Married` as a readonly property that calls the LINQ `Any` method to return `true` if there are any items in the `Spouses` list, as shown in the following code:
+```cs
+// Is this person married to anyone?
+public bool Married => Spouses.Any();
+
+// Allow multiple spouses.
+public List<Person> Spouses = new();
+```
+
+Then we can implement the `static Marry` method by checking if the person is already in the list and then adding them if they are not, as shown in the following code:
+```cs
+// static method to marry
+public static void Marry(Person p1, Person p2)
+{
+  if (p1.Spouses.Contains(p2) || p2.Spouses.Contains(p1))
+  {
+    throw new ArgumentException(
+      string.Format("{0} is already married to {1}.",
+      arg0: p1.Name, arg1: p2.Name));
+  }
+  else
+  {
+    p1.Spouses.Add(p2);
+    p2.Spouses.Add(p1);
+  }
+}
+
+// instance method to marry
+public void Marry(Person partner)
+{
+  Marry(this, partner);
+}
+```
+
+For convenience, we could create a method to output the number of and names of spouses of the current person, as shown in the following code:
+```cs
+public void OutputSpouses()
+{
+  if (Married)
+  {
+    string term = Spouses.Count == 1 ? "person" : "people";
+    WriteLine($"{Name} is married to {Spouses.Count} {term}:");
+    foreach (Person spouse in Spouses)
+    {
+      WriteLine($"  {spouse.Name}");
+    }
+  }
+  else
+  {
+    WriteLine($"{Name} is not married.");
+  }
+}
+```
+
+We would also need to change the `Procreate` method to check that the two people are married before allowing them to make a baby, as shown in the following code:
+```cs
+// static method to "multiply"
+public static Person Procreate(Person p1, Person p2)
+{
+  if (!p1.Spouses.Contains(p2))
+  {
+    throw new ArgumentException(
+      string.Format("{0} must be married to {1} to procreate with them.",
+      arg0: p1.Name, arg1: p2.Name));
+  }
+
+  Person baby = new()
+  {
+    Name = $"Baby of {p1.Name} and {p2.Name}",
+    DateOfBirth = DateTime.Now
+  };
+
+  p1.Children.Add(baby);
+  p2.Children.Add(baby);
+
+  return baby;
+}
+```
+
+Finally, we can call the `OutputSpouses` method in `Program.cs`, as shown in the following code:
+```cs
+// Implementing functionality using methods
+Person lamech = new() { Name = "Lamech" };
+Person adah = new() { Name = "Adah" };
+Person zillah = new() { Name = "Zillah" };
+
+lamech.Marry(adah);
+// Person.Marry(zillah, lamech);
+
+if (zillah + lamech)
+{
+  WriteLine($"{zillah.Name} and {lamech.Name} successfully got married.");
+}
+else
+{
+  WriteLine($"{zillah.Name} and {lamech.Name} failed to marry.");
+}
+
+lamech.OutputSpouses();
+adah.OutputSpouses();
+zillah.OutputSpouses();
+```
+
+The output should look like this:
+```
+Zillah and Lamech successfully got married.
+Lamech is married to 2 people:
+  Adah
+  Zillah
+Adah is married to 1 person:
+  Lamech
+Zillah is married to 1 person:
+  Lamech
+```
+
 # Page 237 - Implementing functionality using methods
 
 > Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 5 March 2023](https://github.com/markjprice/cs11dotnet7/issues/35).
@@ -259,6 +402,33 @@ message saying that required assets are missing, click Yes to add them.
 Harry was born on a Sunday.
 ```
 
+# Page 270 - Equality of types
+
+> Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 17 March 2023](https://github.com/markjprice/cs11dotnet7/issues/44).
+
+In Step 1, I tell the reader to write a statement to output the values of two integers and if they are equal, as shown in the following code:
+```cs
+WriteLine($"a == b: {(a == b)}");
+```
+It is not necessary to wrap the equality expression in parentheses like this: `(a == b)`. In more complex expressions it might be necessary to control the order of a calculation, and some developers prefer adding parentheses, but here it is not needed, and some code editors like Visual Studio 2022 will recommend that they are removed.
+
+In the next edition, I will remove the parentheses, as shown in the following code:
+```cs
+WriteLine($"a == b: {a == b}");
+```
+
+I will do the same for the output statements in Steps 3, 5, and 7, as shown in the following code:
+```cs
+// Step 3 statement will become:
+WriteLine($"p1 == p2: {p1 == p2}");
+
+// Step 5 statement will become:
+WriteLine($"p1 == p3: {p1 == p3}");
+
+// Step 7 statement will become:
+WriteLine($"p1.Name == p2.Name: {p1.Name == p2.Name}");
+```
+
 # Page 299 - Treating warnings as errors
 
 This section shows how to follow best practice and treat warnings as errors. But doing so means you must write extra code in common scenarios to fix all warnings that will now be treated as errors that prevent compilation during the build process.
@@ -282,6 +452,69 @@ Code in next edition:
 if (name == null) return; // must check for null to remove the warning
 ```
 
+# Page 339 - Viewing source links with Visual Studio 2022
+
+> Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 24 March 2023](https://github.com/markjprice/cs11dotnet7/issues/48).
+
+In Step 3, I wrote, "Right-click in the `Count` method and select **Go To Implementation**."
+
+What happens next depends on a Visual Studio option that the reader can control. This is explained in the following item:
+https://github.com/markjprice/cs11dotnet7/blob/main/docs/errata/errata.md#page-37---getting-definitions-of-types-and-their-members
+
+In the next edition, I will add a note to remind readers about this. I will also add the explantion in the errata item above to Chapter 1 when the feature is first introduced.
+
+# Page 343 - Packaging a library for NuGet
+
+In Step 3, you modify `SharedLibrary.csproj` to add some elements to control how the class library is turned into a NuGet package. If you rely on IntelliSense then it could mislead you to use deprecated tag names. For example, `<PackageIconUrl>` is deprecated in favor of `<PackageIcon>`.
+
+In the next edition, I will add a warning about this and include a reference to the documentation. The tag names are documented in the **MSBuild Property** column in the table found at the following link:
+
+https://learn.microsoft.com/en-us/nuget/reference/msbuild-targets#pack-target
+
+# Page 351 - Using non-.NET Standard libraries
+
+> Thanks to [Masoud Nazari](https://github.com/MAS-OUD) for raising this [issue on 24 March 2023](https://github.com/markjprice/cs11dotnet7/issues/49).
+
+In Step 4, the code sets the `Label` of instances of `Axis` and `Matrix<T>` using the concatenate operator `+`, as shown in the following code:
+```cs
+for (int i = 0; i < matrix.Axes[0].Points.Length; i++)
+{
+  matrix.Axes[0].Points[i].Label = "x" + i.ToString();
+}
+
+for (int i = 0; i < matrix.Axes[1].Points.Length; i++)
+{
+  matrix.Axes[1].Points[i].Label = "y" + i.ToString();
+}
+```
+
+It would be an improvement if the expressions used interpolated strings, as shown in the following code:
+```cs
+for (int i = 0; i < matrix.Axes[0].Points.Length; i++)
+{
+  matrix.Axes[0].Points[i].Label = $"x{i}";
+}
+
+for (int i = 0; i < matrix.Axes[1].Points.Length; i++)
+{
+  matrix.Axes[1].Points[i].Label = $"y{i}";
+}
+```
+
+# Page 378 - Dictionaries
+
+In the next edition, I will add a note at the bottom of this section to set an expectation that readers will come across dictionaries again later in the book in more practical ways.
+
+> Note: In Chapter 11, LINQ, you will learn how to create dictionaries and lookups from existing data sources like tables in a database using LINQ methods like `ToDictionary` and `ToLookup`. This is a much more common use than manually adding items to a dictionary as shown in this section.
+
+# Page 444 - Connecting to a database
+
+I wrote, "To connect to a SQLite database, we just need to know the database filename, set using the parameter `Filename`." 
+
+In the next edition I will change this to, "To connect to a SQLite database, we just need to know the path to the database, set using the modern parameter named `Data Source` or the legacy parameter named `Filename`. The path can be relative to the current directory or an absolute path."
+
+Throughout the rest of the book, I will replace the `Filename` parameter with `Data Source` for consistency with modern parameters. For example on pages 445, 453, 456, 464, 504, 541, and 547.
+
 # Page 453 - Scaffolding models using an existing database
 
 In Step 2, I show text that must be entered as a single line at the command-line, as shown in the following command formatted as in the print book:
@@ -297,6 +530,59 @@ I recommend that you type from the print book or copy and paste long commands li
 For convenience, here is the same command as a single line to make it easier to copy and paste:
 ```
 dotnet ef dbcontext scaffold "Filename=Northwind.db" Microsoft.EntityFrameworkCore.Sqlite --table Categories --table Products --output-dir AutoGenModels --namespace WorkingWithEFCore.AutoGen --data-annotations --context Northwind
+```
+
+# Page 512 - Group-joining sequences
+
+> Thanks to Amer Cejudo who raised this issue via email.
+
+After this section, I will add a new section titled **Grouping for lookups**. It will cover the `ToLookup` method that I later use in a solution to an exercise but never cover in the book itself!
+
+Imagine that you have a table named `Customers` in a database that includes a column for the country they reside in, as shown in the following table:
+
+|CompanyName|Country|
+|---|---|
+|Alfreds Futterkiste|Germany|
+|Blauer See Delikatessen|Germany|
+|Great Lakes Food Market|USA|
+|Hungry Coyote Import Store|USA|
+|Lazy K Kountry Store|USA|
+
+You might want to create a data structure in memory that can group the `Customer` objects by their country, and provide a quick way to look up all the customers in a specific country. You can create this using the `ToLookup` LINQ method, as shown in the following code:
+```cs
+ILookup<string?, Customer>? customersByCountry = db.Customers.ToLookup(c => c.Country);
+```
+This creates a dictionary-like data structure in memory that has unique country names for the key and a collection of `Customer` objects for the value, as shown in the following table:
+
+|Key|Value (collection of Customers)|
+|---|---|
+|Germany| [Alfreds Futterkiste] [Blauer See Delikatessen]|
+|USA|[Great Lakes Food Market] [Hungry Coyote Import Store] [Lazy K Kountry Store]|
+
+> Note the company names in square brackets like [Alfreds Futterkiste] represent an entire `Customer` object stored in a collection.
+
+We can then lookup an individual collection of customers for a specific country, as shown in the following code:
+```cs
+IEnumerable<Customer> customersInGermany = customersByCountry["Germany"];
+
+foreach (Customer customer in customersInGermany)
+{
+  WriteLine(customer.CompanyName);
+}
+```
+
+Or we can enumerate through the whole lookup, using an `IGrouping<string?, Customer>` to represent each *row* in the lookup dictionary, as shown in the following code:
+
+```cs
+foreach (IGrouping<string?, Customer> cbc in customersByCountry)
+{
+  WriteLine(cbc.Key); // Outputs: Germany, USA, and so on.
+  
+  foreach (Customer customer in cbc)
+  {
+    WriteLine(customer.CompanyName);
+  }
+}
 ```
 
 # Page 533 - Building websites using ASP.NET Core
@@ -323,6 +609,8 @@ A **Razor Layout** file like `_MyCustomLayout.cshtml` is identical to a **Razor 
 ```
 
 > **Warning!** Be careful to use the correct file extension and directive at the top of the file or you will get unexpected behavior.
+
+> **Convention**: The naming convention for special and shared Razor files like layouts and partial views is to prefix with an underscore `_`. For example, `_ViewStart.cshtml`, `_Layout.cshtml`, or `_Product.cshtml` (a partial view for rendering a product).
 
 ![Visual Studio 2022 Razor project item types](images/razor-file-types.png)
 
@@ -420,7 +708,9 @@ public static IServiceCollection AddNorthwindContext(
     options.LogTo(WriteLine, // Console
       new[] { Microsoft.EntityFrameworkCore
         .Diagnostics.RelationalEventId.CommandExecuting });
-  });
+  }), 
+  // Register with a transient lifetime to avoid concurrency issues Blazor Server projects.
+  contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient);
 
   return services;
 }
@@ -489,7 +779,9 @@ public static IServiceCollection AddNorthwindContext(
     options.LogTo(WriteLine, // Console
       new[] { Microsoft.EntityFrameworkCore
         .Diagnostics.RelationalEventId.CommandExecuting });
-  });
+  }), 
+  // Register with a transient lifetime to avoid concurrency issues Blazor Server projects.
+  contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Transient);
 
   return services;
 }
@@ -502,6 +794,12 @@ This section starts with a description of Razor Pages. The first bullet point sa
 In the next edition, I will add a warning, as shown in the following note:
 
 > **Warning!** *Razor Pages* are different from *Razor Views* (used in ASP.NET Core MVC) but they share the same file extension `.cshtml`. When creating a *Razor View*, do NOT use the `@page` directive!
+
+# Page 586 - Creating a Razor class library, Page 587 - Implementing a partial view to show a single employee
+
+In these sections you create two files named `Employees.cshtml` and `_Employee.cshtml`. I think the order that these files are created and the similarity of their names can confuse some readers. I will start this section with more explanation about what the reader is about to do i.e. create a Razor Page and a partial view, and that the Razor Page will use the partial view.
+
+To make it clearer how they are related, what they do, and what their names mean, in the next edition, I will tell the reader to create the partial view that shows a single employee first and keep its name as `_Employee.cshtml`. Then I will tell the reader to create the Razor Page that uses that partial view but name it `EmployeesList.cshtml`. 
 
 # Page 601 - Setting up an ASP.NET Core MVC website
 
